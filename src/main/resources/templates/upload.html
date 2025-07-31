@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload File – NYX</title>
+    <link rel="stylesheet" href="/css/upload.css">
+</head>
+<body>
+<div class="upload-container">
+    <h1>📁 Upload to NYX Vault</h1>
+    <form method="post" enctype="multipart/form-data" action="/upload">
+        <label for="file" class="file-label">Choose a file:</label>
+        <input type="file" id="file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+    <p class="hint">Your files are shared privately through your local mesh.</p>
+</div>
+</body>
+</html>
