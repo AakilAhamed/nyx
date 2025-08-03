@@ -4,16 +4,148 @@
     <meta charset="UTF-8">
     <title>Upload File – NYX</title>
     <link rel="stylesheet" href="/css/upload.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        .share-info {
+            background: #f0f8ff;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .share-code {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2196F3;
+            letter-spacing: 0.2em;
+            margin: 10px 0;
+        }
+        .share-instructions {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .copy-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .copy-btn:hover {
+            background: #1976D2;
+        }
+    </style>
 </head>
 <body>
 <div class="upload-container">
-    <h1>📁 Upload to NYX Vault</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>📁 Upload to NYX Vault</h1>
+        <a href="/vault" style="background: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">🗃️ View Vault</a>
+    </div>
     <form method="post" enctype="multipart/form-data" action="/upload">
         <label for="file" class="file-label">Choose a file:</label>
         <input type="file" id="file" name="file" required>
         <button type="submit">Upload</button>
     </form>
+
+    <div th:if="${message}" class="message"
+         th:classappend="${#strings.contains(message, '✅')} ? 'success' : (${#strings.contains(message, '❌')} ? 'error' : 'warning')">
+        <p th:text="${message}"></p>
+    </div>
+
+    <div th:if="${shareCode}" class="share-info">
+        <h3>🎉 File uploaded successfully!</h3>
+        <p><strong th:text="${fileName}"></strong></p>
+        <div class="share-code" th:text="${shareCode}"></div>
+        <p>Share this 4-digit code with other devices</p>
+        <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn">Copy Code</button>
+        <button class="copy-btn" onclick="generateQR()" id="qrBtn">Generate QR Code</button>
+        <div id="qrcode" style="margin: 10px 0;"></div>
+        <div class="share-instructions">
+            <p>📱 <strong>How to share:</strong></p>
+            <p>1. Other devices connect to your hotspot</p>
+            <p>2. They visit: <span id="shareUrl">Loading...</span><span th:text="${shareCode}"></span></p>
+            <p>3. They can download the file using the code</p>
+        </div>
+    </div>
+
     <p class="hint">Your files are shared privately through your local mesh.</p>
 </div>
+
+<script>
+    function copyToClipboard() {
+        const code = document.querySelector('.share-code').textContent;
+        navigator.clipboard.writeText(code).then(function () {
+            const btn = document.getElementById('copyBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.style.background = '#4CAF50';
+            setTimeout(function () {
+                btn.textContent = originalText;
+                btn.style.background = '#2196F3';
+            }, 2000);
+        }).catch(function () {
+            const textArea = document.createElement('textarea');
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            const btn = document.getElementById('copyBtn');
+            btn.textContent = 'Copied!';
+            setTimeout(function () {
+                btn.textContent = 'Copy Code';
+            }, 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const messageDiv = document.querySelector('.message');
+        if (messageDiv) {
+            setTimeout(function () {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transition = 'opacity 0.5s ease-out';
+                setTimeout(function () {
+                    messageDiv.style.display = 'none';
+                }, 500);
+            }, 5000);
+        }
+
+        const shareUrlSpan = document.getElementById('shareUrl');
+        if (shareUrlSpan && shareUrlSpan.textContent === 'Loading...') {
+            fetch('/api/network-info')
+                .then(response => response.text())
+                .then(ip => {
+                    shareUrlSpan.textContent = ip + ':8080/info/';
+                    window.deviceIP = ip;
+                })
+                .catch(error => {
+                    shareUrlSpan.textContent = 'your-ip:8080/info/';
+                });
+        }
+    });
+
+    function generateQR() {
+        const code = document.querySelector('.share-code').textContent.trim();
+        const ip = window.deviceIP || 'your-ip';
+        const url = `http://${ip}:8080/info/${code}`;
+
+        const qrDiv = document.getElementById('qrcode');
+        qrDiv.innerHTML = ''; // Clear previous QR
+
+        const qr = new QRious({
+            value: url,
+            size: 200
+        });
+
+        const img = document.createElement('img');
+        img.src = qr.toDataURL();
+        qrDiv.appendChild(img);
+    }
+</script>
 </body>
 </html>

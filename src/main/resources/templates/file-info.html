@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Info - Nyx</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 30px;
+      letter-spacing: -1px;
+    }
+
+    .file-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: #667eea;
+    }
+
+    .file-info {
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .file-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      word-break: break-all;
+    }
+
+    .file-details {
+      display: grid;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #555;
+    }
+
+    .detail-value {
+      color: #333;
+      font-family: 'Courier New', monospace;
+    }
+
+    .share-code {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .action-buttons {
+      display: grid;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-download {
+      background: linear-gradient(45deg, #28a745, #20c997);
+      color: white;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(45deg, #6c757d, #495057);
+      color: white;
+      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    }
+
+    .error {
+      background: linear-gradient(45deg, #dc3545, #c82333);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .error-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+        margin: 10px;
+      }
+
+      .logo {
+        font-size: 2rem;
+      }
+
+      .file-icon {
+        font-size: 3rem;
+      }
+
+      .file-name {
+        font-size: 1.1rem;
+      }
+
+      .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+    }
+
+    .copy-link {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .copy-link input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #333;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+
+    .copy-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: #5a6fd8;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">NYX</div>
+
+  <!-- Error state -->
+  <div th:if="${error}" class="error">
+    <div class="error-icon">⚠️</div>
+    <div th:text="${error}">File not found</div>
+    <div style="margin-top: 15px;">
+      <a href="/" class="btn btn-secondary">Go Home</a>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div th:unless="${error}">
+    <div class="file-icon">📄</div>
+
+    <div class="file-info">
+      <div class="file-name" th:text="${fileName}">document.pdf</div>
+
+      <div class="file-details">
+        <div class="detail-row">
+          <span class="detail-label">Share Code:</span>
+          <span class="detail-value share-code" th:text="${shareCode}">1234</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">File Size:</span>
+          <span class="detail-value" th:text="${fileSize}">1.2 MB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copy download link -->
+    <div class="copy-link">
+      <input type="text" readonly th:value="${'http://localhost:8080' + downloadUrl}" id="downloadLink">
+      <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+    </div>
+
+    <div class="action-buttons">
+      <a th:href="${downloadUrl}" class="btn btn-download">
+        📥 Download File
+      </a>
+      <a href="/upload" class="btn btn-secondary">
+        📤 Upload Another
+      </a>
+      <a href="/" class="btn btn-secondary">
+        🏠 Home
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyToClipboard() {
+    const input = document.getElementById('downloadLink');
+    input.select();
+    input.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+      document.execCommand('copy');
+      const btn = document.querySelector('.copy-btn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.style.background = '#28a745';
+
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '#667eea';
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  }
+
+  // Auto-select the link when clicked
+  document.getElementById('downloadLink').addEventListener('click', function() {
+    this.select();
+  });
+</script>
+</body>
+</html>
